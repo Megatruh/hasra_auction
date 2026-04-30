@@ -18,6 +18,7 @@ class AuctionSeeder extends Seeder
         $car = Car::create([
             'merk' => 'Toyota',
             'model' => 'Supra MK4',
+            'odometer' => 120000,
             'tahun' => 1998,
             'grade' => 'A',
             'deskripsi' => 'Kondisi mesin standar pabrik, cat orisinal.',

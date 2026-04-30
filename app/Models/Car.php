@@ -24,6 +24,7 @@ class Car extends Model
     ];
 
     public function carStatus(){
-        return $this->belongsTo('Auction::class');
+        // A car can be attached to one auction session via auctions.car_id
+        return $this->hasOne(Auction::class, 'car_id');
     }
 }

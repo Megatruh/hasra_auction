@@ -174,26 +174,25 @@
                         <!-- Current Price -->
                         <div class="bg-gray-50 rounded-lg p-4">
                             <p class="text-sm text-gray-600 font-medium mb-2">Harga Saat Ini</p>
-                            <p class="text-3xl font-bold text-indigo-600">
-                                Rp {{ number_format(
-                                    $auction->highestBid ? $auction->highestBid->bid_amount : $auction->car->harga_awal,
-                                    0,
-                                    ',',
-                                    '.'
-                                ) }}
+                            <span id="current-bid" class="text-indigo-600 font-bold text-2xl">
+                                Rp {{ number_format($auction->highestBid ? $auction->highestBid->bid_amount : $auction->car->harga_awal, 0, ',', '.') }}
+                            </span>
+
+                            <p class="text-xs text-gray-500 mt-2">
+                                Penawaran tertinggi oleh:
+                                <span id="highest-bidder" class="text-gray-900 font-bold">
+                                    {{ $auction->highestBid ? $auction->highestBid->user->name : 'Belum ada penawar' }}
+                                </span>
                             </p>
-                            @if($auction->highestBid)
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Penawaran tertinggi oleh: <span class="font-semibold">{{ $auction->highestBid->user->name ?? 'Anonymous' }}</span>
-                                </p>
-                            @else
-                                <p class="text-xs text-gray-500 mt-2">Harga pembukaan</p>
+
+                            @if(!$auction->highestBid)
+                                <p class="text-xs text-gray-500 mt-1">Harga pembukaan</p>
                             @endif
                         </div>
 
                         <!-- Bidding Form -->
                         @if($auction->status === 'active')
-                            <form action="{{ route('auctions.placeBid', $auction->id) }}" method="POST" class="space-y-4">
+                            <form action="{{ route('player.auction.bid', $auction->id) }}" method="POST" class="space-y-4">
                                 @csrf
 
                                 <!-- Bid Amount Input -->
@@ -258,7 +257,7 @@
                         <div class="border-t pt-4 space-y-3">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600">Total Penawaran:</span>
-                                <span class="font-bold text-gray-900">{{ $auction->bids_count ?? 0 }}</span>
+                                <span id="bids-count" class="font-bold text-gray-900">{{ $auction->bids_count ?? 0 }}</span>
                             </div>
                             @if($auction->created_at)
                                 <div class="flex justify-between items-center text-sm">
@@ -272,5 +271,44 @@
             </div>
         </div>
     </div>
+    <script type="module">
+        // Di dalam blok script show.blade.php
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            if (countdownElement) {
+                countdownElement.innerText = "0";
+            }
+            
+            // Pastikan hanya reload jika status lelang aktif
+            @if($auction->status === 'active')
+                window.location.reload();
+            @endif
+        }
+        console.log("Menghubungkan ke channel: auction.{{ $auction->id }}");
+
+        window.Echo.channel('auction.{{ $auction->id }}')
+            .listen('.bid.updated', (e) => {
+                console.log('Event bid.updated diterima:', e);
+
+                // 1. Update Harga Tertinggi
+                const priceElement = document.getElementById('current-bid');
+                if (priceElement) {
+                    priceElement.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(e.bid.bid_amount);
+                }
+
+                // 2. Update Nama Penawar
+                const bidderElement = document.getElementById('highest-bidder');
+                if (bidderElement) {
+                    bidderElement.innerText = e?.bid?.user?.name ?? 'Belum ada penawar';
+                }
+
+                // 3. Update Jumlah Penawaran
+                const countElement = document.getElementById('bids-count');
+                if (countElement) {
+                    const currentCount = parseInt(countElement.innerText) || 0;
+                    countElement.innerText = currentCount + 1;
+                }
+            });
+    </script>
 </body>
 </html>

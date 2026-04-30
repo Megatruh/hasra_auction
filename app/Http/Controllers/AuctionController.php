@@ -10,6 +10,42 @@ use Illuminate\Support\Facades\Auth;
 class AuctionController extends Controller
 {
     /**
+     * Dashboard untuk player
+     */
+    public function playerDashboard()
+    {
+        $auctions = Auction::query()
+            ->with(['car', 'highestBid.user'])
+            ->withCount('bids')
+            ->latest()
+            ->get();
+
+        return view('player.dashboard', compact('auctions'));
+    }
+
+    /**
+     * Dashboard untuk host
+     */
+    public function hostDashboard()
+    {
+        $auctions = Auction::query()
+            ->with(['car', 'highestBid.user'])
+            ->withCount('bids')
+            ->latest()
+            ->get();
+
+        return view('host.dashboard', compact('auctions'));
+    }
+
+    /**
+     * Form create auction (host)
+     */
+    public function create()
+    {
+        return view('host.auctions.create');
+    }
+
+    /**
      * Menampilkan detail mobil lelang
      */
     public function show(Auction $auction)
@@ -37,6 +73,11 @@ class AuctionController extends Controller
         // Misal kita tetapkan minimal naik Rp 500.000
         if ($newBidAmount <= $currentHighestBid) {
             return back()->with('error', 'Penawaran harus lebih tinggi dari harga saat ini!');
+        }
+
+        // Validasi : Jangan biarkan user yang sama ngebid dua kali berturut-turut
+        if ($auction->highestBid && $auction->highestBid->user_id === Auth::id()) {
+            return back()->with('error', 'Kamu masih menjadi penawar tertinggi!');
         }
 
         // 3. Simpan penawaran ke database

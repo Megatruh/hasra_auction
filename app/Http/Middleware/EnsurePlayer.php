@@ -16,8 +16,12 @@ class EnsurePlayer
      */
     public function handle(Request $request, Closure $next)
     {
-        if(Auth::check() && Auth::user()->role === 'player'){
+        // Note: Route group already has `auth` middleware, but we still guard here
+        // to ensure this middleware always returns a valid Response.
+        if (Auth::check() && Auth::user()->role === 'player') {
             return $next($request);
         }
+
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
     }
 }
