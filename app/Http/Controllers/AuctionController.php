@@ -14,8 +14,8 @@ class AuctionController extends Controller
      */
     public function show(Auction $auction)
     {
-        // Load relasi car dan bid tertinggi
-        $auction->load(['car', 'highestBid.user']);
+        // Load relasi car, bid tertinggi, dan hitung jumlah bid
+        $auction->load(['car', 'highestBid.user'])->loadCount('bids');
         
         return view('auctions.show', compact('auction'));
     }
