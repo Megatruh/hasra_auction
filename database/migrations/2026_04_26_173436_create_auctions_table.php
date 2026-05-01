@@ -30,6 +30,7 @@ return new class extends Migration
         Schema::create('auctions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('car_id')->constrained()->cascadeOnDelete();
+            $table->integer('current_round')->default(1);
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['pending', 'active', 'closed'])->default('pending');
@@ -41,6 +42,7 @@ return new class extends Migration
             $table->bigInteger('bid_amount');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('auction_id')->constrained()->cascadeOnDelete();
+            $table->integer('round_number')->default(1);
             $table->timestamps();
         });
     }

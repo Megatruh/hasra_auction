@@ -91,6 +91,7 @@ class AuctionController extends Controller
             'auction_id' => $auction->id,
             'user_id' => Auth::id(),
             'bid_amount' => $newBidAmount,
+            'round_number' => $auction->current_round,
         ]);
 
 
@@ -99,5 +100,80 @@ class AuctionController extends Controller
         broadcast(new BidPlaced($bid))->toOthers();
 
         return back()->with('success', 'Berhasil melakukan penawaran!');
+    }
+    /**
+     * Membuka sesi lelang (dari pending ke active)
+     */
+    public function startAuction(Auction $auction)
+    {
+        // Validasi agar hanya host yang bisa membuka lelang
+        if (Auth::user()->role !== 'host') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $auction->update([
+            'status' => 'active',
+            'start_time' => now(),
+            'end_time' => now()->addMinute(),
+            'current_round' => 1, // Catat waktu mulai
+        ]);
+
+        return back()->with('success', 'Sesi lelang berhasil dibuka!');
+    }
+
+    /**
+     * Menutup sesi lelang (dari active ke closed)
+     */
+    public function closeAuction(Auction $auction)
+    {
+        if (Auth::user()->role !== 'host') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $auction->update([
+            'status' => 'closed',
+            'end_time' => now(), // Catat waktu selesai
+        ]);
+
+        return back()->with('success', 'Sesi lelang berhasil ditutup. Pemenang telah ditentukan!');
+    }
+    /**
+     * Menampilkan halaman kontrol / sesi lelang untuk host.
+     */
+    public function hostSession(Auction $auction)
+    {
+        $auction->load(['car', 'highestBid.user', 'bids.user']);
+        $auction->loadCount('bids');
+
+        return view('host.auctions.session', compact('auction'));
+    }
+
+    /**
+     * Wasit Putaran: Mengevaluasi pemenang di ronde berjalan
+     */
+    public function evaluateRound(Auction $auction)
+    {
+        if ($auction->status !== 'active') return response()->json(['message' => 'Lelang tidak aktif'], 400);
+
+        $hasBidsThisRound = Bid::query()
+            ->where('auction_id', $auction->id)
+            ->where('round_number', $auction->current_round)
+            ->exists();
+
+        if ($hasBidsThisRound) {
+            // Jika ada bid di ronde ini, ronde berlanjut dan waktu diperpanjang 1 menit.
+            $auction->update([
+                'current_round' => $auction->current_round + 1,
+                'end_time' => now()->addMinute(),
+            ]);
+            return response()->json(['status' => 'continue']);
+        } else {
+            // Jika tidak ada bid sama sekali di ronde ini, lelang ditutup.
+            $auction->update([
+                'status' => 'closed',
+                'end_time' => now(),
+            ]);
+            return response()->json(['status' => 'closed']);
+        }
     }
 }

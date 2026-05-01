@@ -15,7 +15,7 @@
                     <p class="text-sm text-gray-600">Kelola lelang yang tersedia.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('host.auctions.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm">Buat Lelang</a>
+                    <a href="{{ route('host.auction.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm">Buat Lelang</a>
                     <a href="/" class="text-indigo-600 hover:text-indigo-700 font-semibold">Kembali</a>
                 </div>
             </div>

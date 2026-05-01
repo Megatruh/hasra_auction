@@ -14,6 +14,7 @@ class Bid extends Model
         'bid_amount',
         'user_id',
         'auction_id',
+        'round_number',
     ];
 
     public function auction()

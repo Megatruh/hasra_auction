@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'host@utama.com',
             'email_verified_at' => now(),
             'no_hp' => '081234567890',
-            'password' => bcrypt('HostPass123'),
+            'password' => bcrypt('Plmoki09'),
             'role' => 'host',
         ]);
 

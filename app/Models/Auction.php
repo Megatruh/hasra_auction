@@ -13,6 +13,9 @@ class Auction extends Model
     protected $fillable = [
         'car_id',
         'status',
+        'start_time',
+        'end_time',
+        'current_round',
     ];
     protected $casts = [
         'start_time'=>'datetime',

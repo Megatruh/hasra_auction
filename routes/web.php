@@ -59,13 +59,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['host'])->prefix('host')->name('host.')->group(function () {
         Route::get('/dashboard', [
             AuctionController::class, 
-            'hostDashboard'
-        ])->name('dashboard');
+            'hostDashboard'])->name('dashboard');
 
         Route::get('/auctions/create', [
             AuctionController::class, 
-            'create'
-        ])->name('auction.create');
+            'create'])->name('auction.create');
+
+        // Route::get('/auctions/{auction}/session', [
+        //     AuctionController::class, 
+        //     'hostSession'])->name('auction.session');
+        Route::get('/auctions/{auction}/session', [
+            AuctionController::class, 
+            'hostSession'])->name('auction.session');
+        
+        Route::patch('/auctions/{auction}/start', [
+            AuctionController::class, 
+            'startAuction'
+        ])->name('auction.start');
+
+        Route::patch('/auctions/{auction}/close', [
+            AuctionController::class, 
+            'closeAuction'
+        ])->name('auction.close');
+
+        Route::post('/auctions/{auction}/evaluate', [
+            AuctionController::class, 
+            'evaluateRound'])->name('auction.evaluate');
 
         Route::post('/auctions', [
             AuctionController::class, 

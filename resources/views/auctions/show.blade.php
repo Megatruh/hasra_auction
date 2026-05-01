@@ -189,7 +189,77 @@
                                 <p class="text-xs text-gray-500 mt-1">Harga pembukaan</p>
                             @endif
                         </div>
+@auth
+    @if(auth()->user()->role === 'host')
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 mt-6">
+            <h3 class="text-sm font-bold text-gray-900 mb-4">Panel Kontrol Host</h3>
 
+            @if($auction->status === 'pending')
+                <form action="{{ route('host.auction.start', $auction->id) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 text-center">
+                        Mulai Lelang
+                    </button>
+                </form>
+            @elseif($auction->status === 'active')
+                <div class="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-center">
+                    <span class="text-xs text-indigo-600 font-bold uppercase tracking-wider">Sisa Waktu Lelang</span>
+                    <div id="timer" class="text-2xl font-black text-indigo-900 mt-1">00:00</div>
+                </div>
+
+                <form action="{{ route('host.auction.close', $auction->id) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 text-center">
+                        Tutup Lelang
+                    </button>
+                </form>
+            @else
+                <div class="bg-gray-100 text-gray-600 font-semibold py-3 px-4 rounded-xl text-center">
+                    Lelang Selesai
+                </div>
+            @endif
+        </div>
+
+        @if($auction->status === 'active' && $auction->end_time)
+            <script>
+                const endTime = new Date("{{ $auction->end_time->toIso8601String() }}").getTime();
+                
+                const timerFunction = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = endTime - now;
+
+                    if (distance < 0) {
+                        clearInterval(timerFunction);
+                        const timerEl = document.getElementById("timer");
+                        if (timerEl) timerEl.innerHTML = "Merekap...";
+
+                        // Host memicu evaluasi ronde via AJAX
+                        fetch("{{ route('host.auction.evaluate', $auction->id) }}", {
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                "Accept": "application/json"
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                        return;
+                    }
+
+                    // Update tampilan countdown host
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    const timerEl = document.getElementById("timer");
+                    if (timerEl) {
+                        timerEl.innerHTML = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                    }
+                }, 1000);
+            </script>
+        @endif
+    @endif
+@endauth
                         <!-- Bidding Form -->
                         @if($auction->status === 'active')
                             <form action="{{ route('player.auction.bid', $auction->id) }}" method="POST" class="space-y-4">
@@ -225,7 +295,7 @@
                                         ) }}
                                     </p>
                                 </div>
-                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-md">
+                                {{-- <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-md">
                                         <div class="flex">
                                             <div class="flex-shrink-0">
                                                 <svg class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
@@ -239,7 +309,7 @@
                                                 </p>
                                             </div>
                                         </div>
-                                    </div>                                
+                                    </div>                                 --}}
 
                                 <!-- Submit Button -->
                                 <button 
@@ -286,6 +356,44 @@
             </div>
         </div>
     </div>
+    @if($auction->status === 'active' && $auction->end_time)
+        @auth
+            @if(auth()->user()->role === 'player')
+                <div class="p-4 bg-indigo-50 rounded-lg text-center mb-6">
+                    <span class="text-xs text-indigo-600 font-bold uppercase">Sisa Waktu Lelang</span>
+                    <div id="player-timer" class="text-2xl font-black text-indigo-900 mt-1">00:00</div>
+                </div> 
+            @endif
+        @endauth
+ 
+        
+        <script>
+            const endTimePlayer = new Date("{{ $auction->end_time->toIso8601String() }}").getTime();
+            const countdown = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTimePlayer - now;
+
+                if (distance < 0) {
+                    clearInterval(countdown);
+                    const timerEl = document.getElementById("player-timer");
+                    if (timerEl) timerEl.innerHTML = "Merekap Putaran...";
+
+                    // Beri waktu host mengeksekusi evaluasi ronde, lalu reload.
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                    return;
+                } else {
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    document.getElementById("player-timer").innerHTML = 
+                        (minutes < 10 ? "0" : "") + minutes + ":" + 
+                        (seconds < 10 ? "0" : "") + seconds;
+                }
+            }, 1000);
+        </script>
+    @endif
+{{--     
     <script type="module">
         document.addEventListener("DOMContentLoaded", function () {
             let timeLeft = 30;
@@ -344,6 +452,6 @@
                     countElement.innerText = currentCount + 1;
                 }
             });
-    </script>
+    </script> --}}
 </body>
 </html>
