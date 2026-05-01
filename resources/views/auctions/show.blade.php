@@ -67,36 +67,24 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Image & Description Section (Left/Top) -->
                 <div class="lg:col-span-2 space-y-6">
-                    <!-- Image Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Large Main Image -->
-                        <div class="md:col-span-2 row-span-2">
-                            <div class="relative w-full h-96 md:h-full rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-                                <img 
-                                    src="{{ asset('storage/' . $auction->car->gambar1) }}" 
-                                    alt="Gambar 1 - {{ $auction->car->merk }} {{ $auction->car->model }}"
-                                    class="w-full h-full object-cover"
-                                >
+                    <!-- Single Hero Image -->
+                    <div class="relative w-full h-[28rem] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-gray-100">
+                        @if($auction->car?->gambar1)
+                            <img 
+                                src="{{ url('storage/cars/' . $auction->car->gambar1) }}" 
+                                alt="{{ $auction->car->merk }} {{ $auction->car->model }}"
+                                class="w-full h-full object-cover"
+                                loading="lazy"
+                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
+                            >
+                            <div class="hidden w-full h-full flex items-center justify-center text-gray-400">
+                                <span>Gambar tidak tersedia</span>
                             </div>
-                        </div>
-
-                        <!-- Small Images (Stacked Right) -->
-                        <div class="space-y-4">
-                            <div class="relative w-full h-44 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-                                <img 
-                                    src="{{ asset('storage/' . $auction->car->gambar2) }}" 
-                                    alt="Gambar 2 - {{ $auction->car->merk }} {{ $auction->car->model }}"
-                                    class="w-full h-full object-cover"
-                                >
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                <span>Gambar tidak tersedia</span>
                             </div>
-                            <div class="relative w-full h-44 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-                                <img 
-                                    src="{{ asset('storage/' . $auction->car->gambar3) }}" 
-                                    alt="Gambar 3 - {{ $auction->car->merk }} {{ $auction->car->model }}"
-                                    class="w-full h-full object-cover"
-                                >
-                            </div>
-                        </div>
+                        @endif
                     </div>
 
                     <!-- Car Info -->
@@ -136,6 +124,18 @@
                                     <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 00-1-1 1 1 0 00-1 1H4a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-3a1 1 0 011-1 1 1 0 011 1v4a3 3 0 01-3 3H6a3 3 0 01-3-3V6z" clip-rule="evenodd" />
                                 </svg>
                                 <span class="text-sm">Harga Awal: <span class="font-semibold text-gray-900">Rp {{ number_format($auction->car->harga_awal, 0, ',', '.') }}</span></span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4 4h12v2H4V4zm0 4h12v2H4V8zm0 4h8v2H4v-2z" />
+                                </svg>
+                                <span class="text-sm">Mesin: <span class="font-semibold text-gray-900">{{ $auction->car->mesin ?? '-' }}</span></span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7 2a1 1 0 00-1 1v1H5a2 2 0 00-2 2v2h14V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H7zm-4 8v6a2 2 0 002 2h10a2 2 0 002-2v-6H3z" />
+                                </svg>
+                                <span class="text-sm">Warna: <span class="font-semibold text-gray-900">{{ $auction->car->warna ?? '-' }}</span></span>
                             </div>
                         </div>
                     </div>
@@ -225,6 +225,21 @@
                                         ) }}
                                     </p>
                                 </div>
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-md">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-yellow-700">
+                                                    Sesi lelang aktif! Waktu tersisa: 
+                                                    <span id="countdown" class="font-bold text-red-600 text-base">30</span> detik.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>                                
 
                                 <!-- Submit Button -->
                                 <button 
@@ -272,6 +287,26 @@
         </div>
     </div>
     <script type="module">
+        document.addEventListener("DOMContentLoaded", function () {
+            let timeLeft = 30;
+            const countdownElement = document.getElementById("countdown");
+
+            if (countdownElement) {
+                const timer = setInterval(function () {
+                    timeLeft--;
+                    countdownElement.innerText = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        
+                        // Pastikan hanya reload jika lelang aktif
+                        @if($auction->status === 'active')
+                            window.location.reload();
+                        @endif
+                    }
+                }, 1000);
+            }
+        });
         // Di dalam blok script show.blade.php
         if (timeLeft <= 0) {
             clearInterval(timer);

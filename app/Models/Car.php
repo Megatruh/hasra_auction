@@ -16,6 +16,8 @@ class Car extends Model
         'tahun',
         'odometer',
         'grade',
+        'mesin',
+        'warna',
         'gambar1',
         'gambar2',
         'gambar3',

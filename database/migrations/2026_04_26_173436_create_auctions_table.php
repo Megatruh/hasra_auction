@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('model');
             $table->integer('tahun');
             $table->integer('odometer')->nullable();
+            $table->string('mesin')->nullable();
+            $table->string('warna')->nullable();
             $table->char('grade',1)->nullable();
             $table->string('gambar1')->nullable();
-            $table->string('gambar2')->nullable();
-            $table->string('gambar3')->nullable();
             $table->text('deskripsi')->nullable();
             $table->bigInteger('harga_awal');
             $table->timestamps();

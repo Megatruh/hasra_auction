@@ -61,6 +61,12 @@ class AuctionController extends Controller
      */
     public function placeBid(Request $request, Auction $auction)
     {
+
+        // Validasi Sesi: pastikan lelang sedang active
+        if ($auction->status !== 'active') {
+            return back()->with('error', 'Sesi lelang belum dibuka atau sudah ditutup.');
+        }
+                
         // 1. Validasi nominal harus ada
         $request->validate([
             'bid_amount' => 'required|numeric|min:1',
@@ -86,6 +92,7 @@ class AuctionController extends Controller
             'user_id' => Auth::id(),
             'bid_amount' => $newBidAmount,
         ]);
+
 
         // 4. Pemicu WebSocket (Real-time update)
         // Ini yang akan mengirim data ke Laravel Reverb

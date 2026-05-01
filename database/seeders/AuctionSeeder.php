@@ -14,23 +14,18 @@ class AuctionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Buat Mobil Contoh
-        $car = Car::create([
-            'merk' => 'Toyota',
-            'model' => 'Supra MK4',
-            'odometer' => 120000,
-            'tahun' => 1998,
-            'grade' => 'A',
-            'deskripsi' => 'Kondisi mesin standar pabrik, cat orisinal.',
-            'harga_awal' => 500000000,
-        ]);
+
+        //ambil data mobil data semua mobil untuk di lelang
+        $cars = Car::all();
 
         // Buka Lelangnya
-        Auction::create([
-            'car_id' => $car->id,
-            'start_time' => now(),
-            'end_time' => now()->addDays(3),
-            'status' => 'active',
-        ]);
+        foreach($cars as $car){
+            Auction::create([
+                'car_id' => $car->id,
+                'status' => 'pending',
+                'start_time' => now(),
+                'end_time' => now()->addDays(3),
+            ]);
+        }
     }
 }
