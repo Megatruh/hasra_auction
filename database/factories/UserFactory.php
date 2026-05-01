@@ -24,16 +24,13 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $firstName = fake()->firstName();
-        $lastName = fake()->lastName();
-        $name = $firstName . ' ' . $lastName;
-        $email = strtolower($firstName) . '.' . strtolower($lastName) . '@example.com';
         return [
-            'name' => $name,
-            'email' => $email,
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'no_hp' => fake()->phoneNumber(),
-            'password' => static::$password ??= Hash::make('Plmoki09'),
+            // Default Laravel/Breeze tests assume the factory user's password is "password".
+            'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'role' => 'player',
         ];

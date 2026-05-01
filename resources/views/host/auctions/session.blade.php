@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sesi Lelang - {{ $auction->car->merk }} {{ $auction->car->model }}</title>
+
+    <!-- Fonts (Old Money) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50 font-sans antialiased">
-    <div class="min-h-screen py-8 px-4">
+<body class="bg-[var(--color-page)] text-gray-900 font-sans antialiased">
+    <div class="min-h-screen py-12 px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Panel Kontrol Host</h1>
+                    <h1 class="font-serif tracking-tight text-4xl text-gray-950">Panel Host</h1>
                     <p class="text-sm text-gray-600">Sesi Lelang: {{ $auction->car->merk }} {{ $auction->car->model }}</p>
                 </div>
                 <a href="{{ route('host.dashboard') }}" class="text-indigo-600 hover:text-indigo-900 font-medium">Kembali ke Dashboard</a>
@@ -19,19 +25,19 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
-                        <div class="w-full md:w-2/5 h-64 bg-gray-100 rounded-xl overflow-hidden shadow-inner">
+                    <div class="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col md:flex-row gap-8">
+                        <div class="w-full md:w-2/5 h-64 bg-gray-100 rounded-2xl overflow-hidden border border-gray-200">
                             <img src="{{ asset('storage/' . $auction->car->gambar1) }}" alt="Gambar Mobil" class="w-full h-full object-cover">
                         </div>
                         <div class="w-full md:w-3/5 flex flex-col justify-between">
                             <div>
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                                    @if($auction->status === 'active') bg-green-100 text-green-800 
-                                    @elseif($auction->status === 'pending') bg-yellow-100 text-yellow-800 
-                                    @else bg-gray-100 text-gray-800 @endif">
+                                <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold
+                                    @if($auction->status === 'active') border-green-200 bg-green-50 text-green-700
+                                    @elseif($auction->status === 'pending') border-yellow-200 bg-yellow-50 text-yellow-700
+                                    @else border-gray-200 bg-gray-50 text-gray-700 @endif">
                                     {{ strtoupper($auction->status) }}
                                 </span>
-                                <h2 class="text-xl font-bold text-gray-900 mt-2">{{ $auction->car->merk }} {{ $auction->car->model }} ({{ $auction->car->tahun }})</h2>
+                                <h2 class="font-serif tracking-tight text-2xl text-gray-950 mt-3">{{ $auction->car->merk }} {{ $auction->car->model }} ({{ $auction->car->tahun }})</h2>
                                 <p class="text-gray-500 text-sm mt-1">Harga Dasar: Rp {{ number_format($auction->car->harga_awal, 0, ',', '.') }}</p>
                             </div>
 
@@ -45,9 +51,9 @@
                                         </button>
                                     </form>
                                 @elseif($auction->status === 'active')
-                                    <div class="mb-4 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-center">
-                                        <span class="text-xs text-indigo-600 font-bold uppercase tracking-wider">Sisa Waktu Lelang</span>
-                                        <div id="timer" class="text-3xl font-black text-indigo-900 mt-1">00:00</div>
+                                    <div class="mb-4 p-6 bg-indigo-50 border border-indigo-100 rounded-2xl text-center">
+                                        <span class="text-xs text-indigo-700 font-semibold uppercase tracking-wider">Sisa Waktu</span>
+                                        <div id="timer" class="mt-2 font-serif tracking-tight text-5xl text-indigo-950">00:00</div>
                                     </div>
                                     <form action="{{ route('host.auction.close', $auction->id) }}" method="POST">
                                         @csrf
@@ -57,7 +63,7 @@
                                         </button>
                                     </form>
                                 @else
-                                    <div class="bg-gray-100 p-4 rounded-xl text-center text-gray-600 font-semibold">
+                                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-2xl text-center text-gray-700 font-semibold">
                                         Lelang Telah Selesai
                                     </div>
                                 @endif
@@ -65,27 +71,27 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Statistik Penawaran (Bid) Saat Ini</h3>
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-4">
+                    <div class="bg-white p-8 rounded-3xl border border-gray-200">
+                        <h3 class="font-serif tracking-tight text-2xl text-gray-950 mb-6">Statistik Penawaran</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
-                                <p class="text-xs text-gray-500 font-semibold uppercase">Penawaran Tertinggi</p>
-                                <p class="text-2xl font-black text-indigo-600 mt-1">
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Penawaran Tertinggi</p>
+                                <p class="mt-2 font-serif tracking-tight text-4xl text-gray-950">
                                     Rp {{ number_format($auction->highestBid ? $auction->highestBid->bid_amount : $auction->car->harga_awal, 0, ',', '.') }}
                                 </p>
                             </div>
-                            <div class="text-right">
-                                <p class="text-xs text-gray-500 font-semibold uppercase">Total Penawaran</p>
-                                <p class="text-xl font-bold text-gray-900 mt-1">{{ $auction->bids_count }} kali</p>
+                            <div class="md:text-right">
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Penawaran</p>
+                                <p class="mt-2 text-2xl font-semibold text-gray-950">{{ $auction->bids_count }} kali</p>
                             </div>
                         </div>
 
                         <div>
                             <p class="text-sm text-gray-600 font-semibold mb-2">Pemenang Sementara:</p>
                             @if($auction->highestBid)
-                                <div class="p-3 bg-indigo-50/40 border border-indigo-100 rounded-lg flex justify-between items-center">
-                                    <span class="font-medium text-indigo-900">{{ $auction->highestBid->user->name }}</span>
-                                    <span class="text-xs text-indigo-600 font-semibold">
+                                <div class="p-5 bg-gray-50 border border-gray-200 rounded-2xl flex justify-between items-center">
+                                    <span class="font-semibold text-gray-950">{{ $auction->highestBid->user->name }}</span>
+                                    <span class="text-xs text-gray-600 font-semibold">
                                         {{ $auction->highestBid->created_at->format('H:i:s') }}
                                     </span>
                                 </div>
@@ -96,17 +102,17 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Daftar Bid Masuk</h3>
-                    <div class="flex-1 overflow-y-auto max-h-[500px] space-y-2 divide-y divide-gray-50">
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 flex flex-col">
+                    <h3 class="font-serif tracking-tight text-2xl text-gray-950 mb-6">Daftar Bid Masuk</h3>
+                    <div class="flex-1 overflow-y-auto max-h-[520px] divide-y divide-gray-100">
                         @forelse($auction->bids->sortByDesc('bid_amount') as $index => $bid)
-                            <div class="py-3 flex justify-between items-center text-sm first:pt-0">
+                            <div class="py-5 flex justify-between items-center text-sm first:pt-0">
                                 <div>
                                     <span class="text-xs font-semibold text-gray-400">#{{ $index + 1 }}</span>
-                                    <span class="font-medium text-gray-800 ml-2">{{ $bid->user->name }}</span>
+                                    <span class="font-semibold text-gray-950 ml-2">{{ $bid->user->name }}</span>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-bold text-indigo-600">Rp {{ number_format($bid->bid_amount, 0, ',', '.') }}</span>
+                                    <span class="font-serif tracking-tight text-xl text-gray-950">Rp {{ number_format($bid->bid_amount, 0, ',', '.') }}</span>
                                     <p class="text-xxs text-gray-400">{{ $bid->created_at->format('H:i:s') }}</p>
                                 </div>
                             </div>

@@ -17,7 +17,7 @@
                 <a href="{{ route('host.dashboard') }}" class="text-indigo-600 hover:text-indigo-700 font-semibold">Kembali</a>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6">
+            <div class="bg-white rounded-xl shadow-xs p-6">
                 <div class="flex items-start gap-3">
                     <svg class="h-6 w-6 text-indigo-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-4a1 1 0 00-1 1v3a1 1 0 00.293.707l2 2a1 1 0 001.414-1.414L11 9.586V7a1 1 0 00-1-1z" clip-rule="evenodd" />
